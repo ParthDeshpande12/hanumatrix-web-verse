@@ -1,10 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Brain, Cpu, Zap, Shield, Globe, ArrowDown } from 'lucide-react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const Story = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -12,80 +8,94 @@ const Story = () => {
   const stepsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Header animation
-      gsap.fromTo(headerRef.current, 
-        { opacity: 0, y: 50 },
-        { 
-          opacity: 1, 
-          y: 0, 
-          duration: 1.5,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-          }
-        }
-      );
+    // Dynamic GSAP import to handle dependency loading
+    const loadGSAP = async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+        
+        gsap.registerPlugin(ScrollTrigger);
 
-      // Story steps animations
-      stepsRef.current.forEach((step, index) => {
-        if (step) {
-          gsap.fromTo(step,
+        const ctx = gsap.context(() => {
+          // Header animation
+          gsap.fromTo(headerRef.current, 
+            { opacity: 0, y: 50 },
             { 
-              opacity: 0, 
-              x: index % 2 === 0 ? -100 : 100,
-              scale: 0.8
-            },
-            {
-              opacity: 1,
-              x: 0,
-              scale: 1,
-              duration: 1.2,
+              opacity: 1, 
+              y: 0, 
+              duration: 1.5,
               ease: "power3.out",
               scrollTrigger: {
-                trigger: step,
-                start: "top 85%",
-                end: "bottom 15%",
-                toggleActions: "play none none reverse"
+                trigger: headerRef.current,
+                start: "top 80%",
+                end: "bottom 20%",
               }
             }
           );
 
-          // Icon rotation animation
-          const icon = step.querySelector('.story-icon');
-          if (icon) {
-            gsap.to(icon, {
-              rotation: 360,
-              duration: 2,
-              ease: "power2.inOut",
-              scrollTrigger: {
-                trigger: step,
-                start: "top 70%",
-                end: "bottom 30%",
+          // Story steps animations
+          stepsRef.current.forEach((step, index) => {
+            if (step) {
+              gsap.fromTo(step,
+                { 
+                  opacity: 0, 
+                  x: index % 2 === 0 ? -100 : 100,
+                  scale: 0.8
+                },
+                {
+                  opacity: 1,
+                  x: 0,
+                  scale: 1,
+                  duration: 1.2,
+                  ease: "power3.out",
+                  scrollTrigger: {
+                    trigger: step,
+                    start: "top 85%",
+                    end: "bottom 15%",
+                    toggleActions: "play none none reverse"
+                  }
+                }
+              );
+
+              // Icon rotation animation
+              const icon = step.querySelector('.story-icon');
+              if (icon) {
+                gsap.to(icon, {
+                  rotation: 360,
+                  duration: 2,
+                  ease: "power2.inOut",
+                  scrollTrigger: {
+                    trigger: step,
+                    start: "top 70%",
+                    end: "bottom 30%",
+                  }
+                });
               }
+            }
+          });
+
+          // Floating particles animation
+          const particles = document.querySelectorAll('.floating-particle');
+          particles.forEach((particle, index) => {
+            gsap.to(particle, {
+              y: -20,
+              duration: 2 + index * 0.3,
+              ease: "power1.inOut",
+              repeat: -1,
+              yoyo: true,
+              delay: index * 0.2
             });
-          }
-        }
-      });
+          });
 
-      // Floating particles animation
-      const particles = document.querySelectorAll('.floating-particle');
-      particles.forEach((particle, index) => {
-        gsap.to(particle, {
-          y: -20,
-          duration: 2 + index * 0.3,
-          ease: "power1.inOut",
-          repeat: -1,
-          yoyo: true,
-          delay: index * 0.2
-        });
-      });
+        }, containerRef);
 
-    }, containerRef);
+        return () => ctx.revert();
+      } catch (error) {
+        console.log('GSAP not loaded yet, using CSS animations fallback');
+      }
+    };
 
-    return () => ctx.revert();
+    loadGSAP();
   }, []);
 
   const storySteps = [

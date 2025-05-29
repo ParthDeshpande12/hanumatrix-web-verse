@@ -3,7 +3,6 @@ import { Suspense, useEffect, useRef } from 'react';
 import { Application } from '@splinetool/runtime';
 import { ArrowRight, Play, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { gsap } from 'gsap';
 
 const SplineHero = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,56 +17,70 @@ const SplineHero = () => {
       // app.load('https://prod.spline.design/your-scene-url/scene.splinecode');
     }
 
-    // GSAP animations
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
+    // Dynamic GSAP import to handle dependency loading
+    const loadGSAP = async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+        
+        gsap.registerPlugin(ScrollTrigger);
 
-      // Hero content animation
-      tl.fromTo(heroContentRef.current?.children || [], 
-        { 
-          opacity: 0, 
-          y: 50,
-          scale: 0.9
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.2,
-          stagger: 0.2,
-          ease: "power3.out"
-        }
-      );
+        // GSAP animations
+        const ctx = gsap.context(() => {
+          const tl = gsap.timeline();
 
-      // Stats animation
-      gsap.fromTo(statsRef.current?.children || [],
-        { 
-          opacity: 0,
-          y: 30
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          stagger: 0.1,
-          delay: 1.5,
-          ease: "power2.out"
-        }
-      );
+          // Hero content animation
+          tl.fromTo(heroContentRef.current?.children || [], 
+            { 
+              opacity: 0, 
+              y: 50,
+              scale: 0.9
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 1.2,
+              stagger: 0.2,
+              ease: "power3.out"
+            }
+          );
 
-      // Floating animation for buttons
-      gsap.to(".floating-btn", {
-        y: -5,
-        duration: 2,
-        ease: "power1.inOut",
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.3
-      });
+          // Stats animation
+          gsap.fromTo(statsRef.current?.children || [],
+            { 
+              opacity: 0,
+              y: 30
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              stagger: 0.1,
+              delay: 1.5,
+              ease: "power2.out"
+            }
+          );
 
-    }, heroContentRef);
+          // Floating animation for buttons
+          gsap.to(".floating-btn", {
+            y: -5,
+            duration: 2,
+            ease: "power1.inOut",
+            repeat: -1,
+            yoyo: true,
+            stagger: 0.3
+          });
 
-    return () => ctx.revert();
+        }, heroContentRef);
+
+        return () => ctx.revert();
+      } catch (error) {
+        console.log('GSAP not loaded yet, using CSS animations fallback');
+      }
+    };
+
+    loadGSAP();
   }, []);
 
   return (
