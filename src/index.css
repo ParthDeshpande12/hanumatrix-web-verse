@@ -64,7 +64,7 @@
 
 @layer components {
   .glow-effect {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
   }
   
   .text-glow {
@@ -72,14 +72,35 @@
   }
   
   .border-glow {
-    border: 1px solid rgba(99, 102, 241, 0.5);
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(249, 115, 22, 0.5);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
   }
 
   .cyber-grid {
     background-image: 
-      linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+      linear-gradient(rgba(249, 115, 22, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(249, 115, 22, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  /* GSAP Animation Classes */
+  .gsap-fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .gsap-scale-in {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  .gsap-slide-left {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  .gsap-slide-right {
+    opacity: 0;
+    transform: translateX(50px);
   }
 }
